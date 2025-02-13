@@ -1,5 +1,6 @@
 package com.nkgamestore.nk_gamestore.entities;
 
+import com.nkgamestore.nk_gamestore.utils.utils.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,8 +14,22 @@ public class User {
     private String email;
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    @Column(name = "phoneNumber")
+    private String phoneNumber;
+
     public Long getId() {
         return id;
+    }
+
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public void setId(Long id) {
@@ -43,5 +58,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

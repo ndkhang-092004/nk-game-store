@@ -1,7 +1,9 @@
 package com.nkgamestore.nk_gamestore.controllers;
 
+import com.nkgamestore.nk_gamestore.entities.User;
 import com.nkgamestore.nk_gamestore.entities.dto.LoginDTO;
 import com.nkgamestore.nk_gamestore.entities.dto.ResLoginDTO;
+import com.nkgamestore.nk_gamestore.services.UserService;
 import com.nkgamestore.nk_gamestore.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +20,16 @@ public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
+    private final UserService userService;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserService userService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
+        this.userService = userService;
     }
 
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody LoginDTO loginDto){
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
@@ -33,9 +37,11 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         String accessToken = this.securityUtil.createToken(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        User user = userService.getUserByEmail(loginDto.getUsername());
 
         ResLoginDTO res = new ResLoginDTO();
         res.setAccessToken(accessToken);
+        res.setUser(user);
         return ResponseEntity.ok().body(res);
     }
 }
